@@ -346,13 +346,12 @@ func main() {
 	log.Printf("server started on localhost:%s", port)
 
 	for {
-		if nmbr < 9 {
+		if len(l) < 9 {
 			conn, err := listener.Accept()
 			if err != nil {
 				log.Printf("failed to accept connection: %s", err.Error())
 				continue
 			}
-			nmbr++
 			c := s.newClient(conn)
 			go newconnection(c, &l, s)
 			go c.readInput(s, &l)
