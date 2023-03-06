@@ -184,8 +184,9 @@ func nick(c *client, l *[]string, s *server, args []string) {
 		return
 	} else {
 		*l = append(*l, args[1])
-		c.nick = args[1]
 		c.msg("[SUCCESS]")
+		c.room.broadcast(c, fmt.Sprintf("%s change his name to %s", c.nick, args[1]))
+		c.nick = args[1]
 	}
 }
 
