@@ -24,6 +24,7 @@ const (
 	CMD_ROOMS
 	CMD_MSG
 	CMD_QUIT
+	CMD_NICK
 )
 
 type command struct {
@@ -91,6 +92,13 @@ func (c *client) readInput(s *server, l *[]string) {
 					client: c,
 					heure:  "[" + time.Now().Format("2006-01-02 15:4:5") + "]",
 				}
+			case "/name":
+				c.commands <- command{
+					id:     CMD_NICK,
+					client: c,
+					args:   args,
+					heure:  "[" + time.Now().Format("2006-01-02 15:4:5") + "]",
+				}
 			default:
 				c.commands <- command{
 					id:     CMD_MSG,
@@ -144,11 +152,40 @@ func (s *server) run(l *[]string) {
 			s.join(cmd.client, cmd.args)
 		case CMD_ROOMS:
 			s.listRooms(cmd.client)
+		case CMD_NICK:
+			nick(cmd.client, l, s, cmd.args)
 		case CMD_MSG:
 			s.msg(cmd.client, cmd.args)
 		case CMD_QUIT:
 			s.quit(cmd.client, l)
 		}
+	}
+}
+func nick(c *client, l *[]string, s *server, args []string) {
+	if len(args) < 2 {
+		c.msg("New name is required. usage: /name PSEUDO")
+		return
+	}
+	var a []string
+	for _, v := range *l {
+		if v != c.nick {
+			a = append(a, v)
+		}
+	}
+	*l = a
+	exist := false
+	for _, v := range *l {
+		if v == args[1] {
+			exist = true
+		}
+	}
+	if exist {
+		c.msg("[The PSEUDO already existe try another one: ]")
+		return
+	} else {
+		*l = append(*l, args[1])
+		c.nick = args[1]
+		c.msg("[SUCCESS]")
 	}
 }
 

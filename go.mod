@@ -1,3 +1,3 @@
-module github.com/01-edu/z01
+module NET-CAT
 
 go 1.17
